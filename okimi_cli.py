@@ -96,17 +96,29 @@ def get_credits_balance(api_key):
 
         if response.status_code == 200:
             data = response.json()
-            # OpenRouter devuelve el balance en data.data.limit y data.data.usage
+            # OpenRouter devuelve info en data.data
             if 'data' in data:
-                limit = data['data'].get('limit', 0)
+                limit = data['data'].get('limit')
                 usage = data['data'].get('usage', 0)
-                remaining = limit - usage
-                return {
-                    'success': True,
-                    'limit': limit,
-                    'usage': usage,
-                    'remaining': remaining
-                }
+
+                # Si no hay límite (cuenta prepago), solo mostramos el uso
+                if limit is None or limit == 0:
+                    return {
+                        'success': True,
+                        'is_prepaid': True,
+                        'usage': usage,
+                        'limit': None,
+                        'remaining': None
+                    }
+                else:
+                    remaining = limit - usage
+                    return {
+                        'success': True,
+                        'is_prepaid': False,
+                        'limit': limit,
+                        'usage': usage,
+                        'remaining': remaining
+                    }
 
         return {'success': False, 'error': 'No se pudo obtener el balance'}
 
@@ -259,25 +271,33 @@ def query_kimi(client, prompt, heavy_mode=False, simple_mode=False, interactive=
             if api_key:
                 balance = get_credits_balance(api_key)
                 if balance['success']:
-                    remaining = balance['remaining']
-                    limit = balance['limit']
-                    usage = balance['usage']
-
-                    # Color según el balance disponible
-                    if remaining > 10:
-                        color = Colors.OKGREEN
-                        status = "✓"
-                    elif remaining > 5:
-                        color = Colors.WARNING
-                        status = "⚠"
+                    # Cuenta prepago (sin límite fijo)
+                    if balance.get('is_prepaid'):
+                        usage = balance['usage']
+                        print(f"  {Colors.OKBLUE}💳 Cuenta prepago (créditos disponibles){Colors.ENDC}")
+                        print(f"  {Colors.OKGREEN}   Uso acumulado: ${usage:.2f} USD{Colors.ENDC}")
+                        print(f"  {Colors.WARNING}   💡 Ver saldo en: https://openrouter.ai/credits{Colors.ENDC}")
+                    # Cuenta con límite fijo
                     else:
-                        color = Colors.FAIL
-                        status = "⚠"
+                        remaining = balance['remaining']
+                        limit = balance['limit']
+                        usage = balance['usage']
 
-                    print(f"  {color}{status} Saldo disponible: ${remaining:.2f} USD{Colors.ENDC}")
-                    print(f"  {Colors.OKBLUE}   (Límite: ${limit:.2f} | Usado: ${usage:.2f}){Colors.ENDC}")
+                        # Color según el balance disponible
+                        if remaining > 10:
+                            color = Colors.OKGREEN
+                            status = "✓"
+                        elif remaining > 5:
+                            color = Colors.WARNING
+                            status = "⚠"
+                        else:
+                            color = Colors.FAIL
+                            status = "⚠"
+
+                        print(f"  {color}{status} Saldo disponible: ${remaining:.2f} USD{Colors.ENDC}")
+                        print(f"  {Colors.OKBLUE}   (Límite: ${limit:.2f} | Usado: ${usage:.2f}){Colors.ENDC}")
                 else:
-                    print(f"  {Colors.WARNING}⚠ No se pudo obtener el saldo{Colors.ENDC}")
+                    print(f"  {Colors.WARNING}⚠ No se pudo obtener el saldo: {balance.get('error', 'Error desconocido')}{Colors.ENDC}")
 
         print()  # Línea en blanco al final
 
