@@ -272,13 +272,26 @@ def query_kimi(client, prompt, heavy_mode=False, simple_mode=False, web_mode=Fal
     try:
         print(f"\n{Colors.OKCYAN}🤔 Procesando...{Colors.ENDC}\n")
 
-        # Primera llamada al modelo
-        response = client.chat.completions.create(**config)
-        message = response.choices[0].message
+        # Loop iterativo de tool calling (máximo 5 rondas)
+        max_iterations = 5
+        iteration = 0
 
-        # Si el modelo quiere usar tools, ejecutarlas
-        if hasattr(message, 'tool_calls') and message.tool_calls:
-            print(f"{Colors.WARNING}🔧 Ejecutando herramientas...{Colors.ENDC}\n")
+        while iteration < max_iterations:
+            iteration += 1
+
+            # Llamar al modelo
+            response = client.chat.completions.create(**config)
+            message = response.choices[0].message
+
+            # Si el modelo ya no quiere usar tools, terminar el loop
+            if not hasattr(message, 'tool_calls') or not message.tool_calls:
+                break
+
+            # El modelo quiere usar tools
+            if iteration == 1:
+                print(f"{Colors.WARNING}🔧 Ejecutando herramientas (Ronda {iteration})...{Colors.ENDC}\n")
+            else:
+                print(f"{Colors.WARNING}🔧 Ronda {iteration} de herramientas...{Colors.ENDC}\n")
 
             # Agregar el mensaje del asistente con tool_calls
             # Convertir tool_calls a dict serializables
@@ -319,15 +332,45 @@ def query_kimi(client, prompt, heavy_mode=False, simple_mode=False, web_mode=Fal
 
                 print(f"  ✓ Resultado obtenido ({len(tool_result)} caracteres)\n")
 
-            # Remover tools de config para la segunda llamada
-            config_second = config.copy()
-            config_second.pop("tools", None)
-            config_second.pop("tool_choice", None)
+        # Si alcanzamos el límite de iteraciones y el modelo todavía quiere tools,
+        # forzar una respuesta final sin tools
+        if iteration >= max_iterations and hasattr(message, 'tool_calls') and message.tool_calls:
+            print(f"{Colors.WARNING}⚠ Límite de {max_iterations} rondas alcanzado, generando respuesta final...{Colors.ENDC}\n")
 
-            # Segunda llamada al modelo con los resultados de las tools
-            print(f"{Colors.OKCYAN}🤔 Generando respuesta final...{Colors.ENDC}\n")
-            response = client.chat.completions.create(**config_second)
+            # Agregar mensaje indicando que no se pueden ejecutar más tools
+            config["messages"].append({
+                "role": "assistant",
+                "content": None,
+                "tool_calls": [{
+                    "id": tc.id,
+                    "type": "function",
+                    "function": {
+                        "name": tc.function.name,
+                        "arguments": tc.function.arguments
+                    }
+                } for tc in message.tool_calls]
+            })
+
+            # Agregar mensajes de tool indicando que se alcanzó el límite
+            for tc in message.tool_calls:
+                config["messages"].append({
+                    "role": "tool",
+                    "tool_call_id": tc.id,
+                    "name": tc.function.name,
+                    "content": f"[Límite de búsquedas alcanzado] Por favor, genera una respuesta con la información ya recopilada en las {max_iterations} búsquedas anteriores."
+                })
+
+            # Remover tools y hacer llamada final
+            config_final = config.copy()
+            config_final.pop("tools", None)
+            config_final.pop("tool_choice", None)
+
+            response = client.chat.completions.create(**config_final)
             message = response.choices[0].message
+
+        # Mostrar número de rondas si hubo tool calling
+        if iteration > 0:
+            print(f"{Colors.OKCYAN}✨ Respuesta final (después de {iteration} ronda{'s' if iteration > 1 else ''} de búsquedas){Colors.ENDC}\n")
 
         # Mostrar respuesta final
         print(f"{Colors.BOLD}═══ RESPUESTA ═══{Colors.ENDC}\n")
