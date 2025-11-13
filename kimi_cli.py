@@ -214,10 +214,12 @@ def query_kimi(client, prompt, heavy_mode=False, simple_mode=False, interactive=
             print(f"  Total: {response.usage.total_tokens:,} tokens")
 
             # Calcular costo aproximado (Chutes pricing)
+            # Precios: $0.60/1M input, $2.50/1M output (via Chutes.ai)
             cost_input = (response.usage.prompt_tokens / 1_000_000) * 0.60
             cost_output = (response.usage.completion_tokens / 1_000_000) * 2.50
             total_cost = cost_input + cost_output
-            print(f"  Costo estimado: ${total_cost:.6f} USD")
+            print(f"\n  {Colors.BOLD}💰 Costo de esta consulta: ${total_cost:.6f} USD{Colors.ENDC}")
+            print(f"  {Colors.WARNING}💡 Ver saldo en: https://chutes.ai/dashboard{Colors.ENDC}")
 
         print()  # Línea en blanco al final
 
