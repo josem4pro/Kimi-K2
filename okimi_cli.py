@@ -139,65 +139,74 @@ def get_credits_balance(api_key):
         return {'success': False, 'error': str(e)}
 
 def get_tools():
-    """Define las herramientas disponibles para el modelo"""
+    """Define las herramientas disponibles para el modelo (solo búsqueda web por ahora)"""
     return [
         {
             "type": "function",
             "function": {
                 "name": "buscar_informacion",
-                "description": "Busca información en internet sobre un tema específico",
+                "description": "Busca información en internet usando SearXNG (meta-buscador con múltiples motores: ArXiv, Google Scholar, GitHub, StackOverflow, Brave, DuckDuckGo)",
                 "parameters": {
                     "type": "object",
                     "properties": {
                         "consulta": {
                             "type": "string",
-                            "description": "Qué buscar (ej: 'sistemas multi-agente IA')"
+                            "description": "Qué buscar (ej: 'chutes.ai API documentation balance endpoint')"
                         }
                     },
                     "required": ["consulta"]
                 }
             }
-        },
-        {
-            "type": "function",
-            "function": {
-                "name": "ejecutar_codigo",
-                "description": "Ejecuta código Python y retorna el resultado",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "codigo": {
-                            "type": "string",
-                            "description": "Código Python a ejecutar"
-                        }
-                    },
-                    "required": ["codigo"]
-                }
-            }
-        },
-        {
-            "type": "function",
-            "function": {
-                "name": "memoria_distribuida",
-                "description": "Accede o actualiza el sistema de memoria distribuida (Neo4j/Centro Consciente)",
-                "parameters": {
-                    "type": "object",
-                    "properties": {
-                        "operacion": {
-                            "type": "string",
-                            "enum": ["leer", "escribir", "buscar"],
-                            "description": "Tipo de operación"
-                        },
-                        "contenido": {
-                            "type": "string",
-                            "description": "Contenido a leer/escribir/buscar"
-                        }
-                    },
-                    "required": ["operacion", "contenido"]
-                }
-            }
         }
     ]
+
+def execute_tool(tool_name, arguments):
+    """Ejecuta una herramienta y retorna el resultado"""
+    try:
+        args = json.loads(arguments) if isinstance(arguments, str) else arguments
+
+        if tool_name == "buscar_informacion":
+            query = args.get("consulta", "")
+
+            # Usar SearXNG local (puerto 8888)
+            response = requests.get(
+                "http://localhost:8888/search",
+                params={"q": query, "format": "json"},
+                timeout=10
+            )
+
+            if response.status_code == 200:
+                data = response.json()
+                results = data.get("results", [])[:5]  # Top 5 resultados
+
+                if not results:
+                    return "No se encontraron resultados para esta búsqueda."
+
+                # Formatear resultados
+                formatted = f"Resultados de búsqueda para '{query}':\n\n"
+                for i, result in enumerate(results, 1):
+                    title = result.get("title", "Sin título")
+                    url = result.get("url", "")
+                    content = result.get("content", "")
+                    engine = result.get("engine", "")
+
+                    formatted += f"{i}. {title}\n"
+                    formatted += f"   URL: {url}\n"
+                    if content:
+                        # Limitar contenido a 200 caracteres
+                        content_preview = content[:200] + "..." if len(content) > 200 else content
+                        formatted += f"   Contenido: {content_preview}\n"
+                    formatted += f"   Motor: {engine}\n\n"
+
+                return formatted
+            else:
+                return f"Error al buscar: HTTP {response.status_code}"
+
+        else:
+            return f"Tool '{tool_name}' no implementada aún"
+
+    except Exception as e:
+        return f"Error al ejecutar {tool_name}: {str(e)}"
 
 def query_kimi(client, prompt, heavy_mode=False, simple_mode=False, web_mode=False, interactive=False, api_key=None):
     """
@@ -252,7 +261,7 @@ def query_kimi(client, prompt, heavy_mode=False, simple_mode=False, web_mode=Fal
 
     # Indicar si las herramientas están activas
     if web_mode or heavy_mode:
-        print(f"   • Tool-calling: ✓ Habilitado (web, código, memoria)")
+        print(f"   • Tool-calling: ✓ Habilitado (búsqueda web vía SearXNG)")
     else:
         print(f"   • Tool-calling: ✗ Deshabilitado (respuesta directa)")
 
@@ -263,18 +272,69 @@ def query_kimi(client, prompt, heavy_mode=False, simple_mode=False, web_mode=Fal
     try:
         print(f"\n{Colors.OKCYAN}🤔 Procesando...{Colors.ENDC}\n")
 
+        # Primera llamada al modelo
         response = client.chat.completions.create(**config)
         message = response.choices[0].message
 
-        # Mostrar respuesta
-        print(f"{Colors.BOLD}═══ RESPUESTA ═══{Colors.ENDC}\n")
-        print(message.content)
-
-        # Mostrar tools invocadas si las hay
+        # Si el modelo quiere usar tools, ejecutarlas
         if hasattr(message, 'tool_calls') and message.tool_calls:
-            print(f"\n{Colors.WARNING}═══ TOOLS INVOCADAS ═══{Colors.ENDC}")
-            for tool in message.tool_calls:
-                print(f"  • {tool.function.name}: {tool.function.arguments}")
+            print(f"{Colors.WARNING}🔧 Ejecutando herramientas...{Colors.ENDC}\n")
+
+            # Agregar el mensaje del asistente con tool_calls
+            # Convertir tool_calls a dict serializables
+            tool_calls_list = []
+            for tc in message.tool_calls:
+                tool_calls_list.append({
+                    "id": tc.id,
+                    "type": "function",
+                    "function": {
+                        "name": tc.function.name,
+                        "arguments": tc.function.arguments
+                    }
+                })
+
+            config["messages"].append({
+                "role": "assistant",
+                "content": None,  # Debe ser None cuando hay tool_calls
+                "tool_calls": tool_calls_list
+            })
+
+            # Ejecutar cada tool y agregar resultados
+            for tool_call in message.tool_calls:
+                tool_name = tool_call.function.name
+                tool_args = tool_call.function.arguments
+
+                print(f"  📡 {tool_name}({tool_args[:80]}...)" if len(tool_args) > 80 else f"  📡 {tool_name}({tool_args})")
+
+                # Ejecutar la tool
+                tool_result = execute_tool(tool_name, tool_args)
+
+                # Agregar el resultado a messages
+                config["messages"].append({
+                    "role": "tool",
+                    "tool_call_id": tool_call.id,
+                    "name": tool_name,
+                    "content": tool_result
+                })
+
+                print(f"  ✓ Resultado obtenido ({len(tool_result)} caracteres)\n")
+
+            # Remover tools de config para la segunda llamada
+            config_second = config.copy()
+            config_second.pop("tools", None)
+            config_second.pop("tool_choice", None)
+
+            # Segunda llamada al modelo con los resultados de las tools
+            print(f"{Colors.OKCYAN}🤔 Generando respuesta final...{Colors.ENDC}\n")
+            response = client.chat.completions.create(**config_second)
+            message = response.choices[0].message
+
+        # Mostrar respuesta final
+        print(f"{Colors.BOLD}═══ RESPUESTA ═══{Colors.ENDC}\n")
+        if message.content:
+            print(message.content)
+        else:
+            print(f"{Colors.WARNING}(Sin contenido de texto){Colors.ENDC}")
 
         # Mostrar uso de tokens
         if response.usage:
