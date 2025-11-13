@@ -20,10 +20,11 @@ from pathlib import Path
 try:
     from dotenv import load_dotenv
     from openai import OpenAI
+    import requests
 except ImportError as e:
     print(f"❌ Error: Falta dependencia: {e}")
     print("\n🔧 Solución: Instala las dependencias con:")
-    print("   pip install python-dotenv openai")
+    print("   pip install python-dotenv openai requests")
     sys.exit(1)
 
 # Colores para terminal
@@ -83,6 +84,34 @@ def create_client(api_key):
     )
     print(f"{Colors.OKGREEN}✓ Cliente configurado: openrouter.ai{Colors.ENDC}")
     return client
+
+def get_credits_balance(api_key):
+    """Obtiene el balance de créditos de OpenRouter"""
+    try:
+        response = requests.get(
+            "https://openrouter.ai/api/v1/auth/key",
+            headers={"Authorization": f"Bearer {api_key}"},
+            timeout=5
+        )
+
+        if response.status_code == 200:
+            data = response.json()
+            # OpenRouter devuelve el balance en data.data.limit y data.data.usage
+            if 'data' in data:
+                limit = data['data'].get('limit', 0)
+                usage = data['data'].get('usage', 0)
+                remaining = limit - usage
+                return {
+                    'success': True,
+                    'limit': limit,
+                    'usage': usage,
+                    'remaining': remaining
+                }
+
+        return {'success': False, 'error': 'No se pudo obtener el balance'}
+
+    except Exception as e:
+        return {'success': False, 'error': str(e)}
 
 def get_tools():
     """Define las herramientas disponibles para el modelo"""
@@ -145,7 +174,7 @@ def get_tools():
         }
     ]
 
-def query_kimi(client, prompt, heavy_mode=False, simple_mode=False, interactive=False):
+def query_kimi(client, prompt, heavy_mode=False, simple_mode=False, interactive=False, api_key=None):
     """
     Consulta a Kimi K2 Thinking vía OpenRouter con todas las capacidades activadas
 
@@ -155,6 +184,7 @@ def query_kimi(client, prompt, heavy_mode=False, simple_mode=False, interactive=
         heavy_mode: Activar Heavy Mode (8 trayectorias paralelas)
         simple_mode: Modo simple sin razonamiento extendido
         interactive: Modo interactivo (permite conversación continua)
+        api_key: API key para consultar balance de créditos
     """
 
     # Configuración base
@@ -223,7 +253,31 @@ def query_kimi(client, prompt, heavy_mode=False, simple_mode=False, interactive=
             cost_input = (response.usage.prompt_tokens / 1_000_000) * 0.60
             cost_output = (response.usage.completion_tokens / 1_000_000) * 2.50
             total_cost = cost_input + cost_output
-            print(f"  Costo estimado: ${total_cost:.6f} USD")
+            print(f"\n  {Colors.BOLD}💰 Costo de esta consulta: ${total_cost:.6f} USD{Colors.ENDC}")
+
+            # Obtener y mostrar balance de créditos de OpenRouter
+            if api_key:
+                balance = get_credits_balance(api_key)
+                if balance['success']:
+                    remaining = balance['remaining']
+                    limit = balance['limit']
+                    usage = balance['usage']
+
+                    # Color según el balance disponible
+                    if remaining > 10:
+                        color = Colors.OKGREEN
+                        status = "✓"
+                    elif remaining > 5:
+                        color = Colors.WARNING
+                        status = "⚠"
+                    else:
+                        color = Colors.FAIL
+                        status = "⚠"
+
+                    print(f"  {color}{status} Saldo disponible: ${remaining:.2f} USD{Colors.ENDC}")
+                    print(f"  {Colors.OKBLUE}   (Límite: ${limit:.2f} | Usado: ${usage:.2f}){Colors.ENDC}")
+                else:
+                    print(f"  {Colors.WARNING}⚠ No se pudo obtener el saldo{Colors.ENDC}")
 
         print()  # Línea en blanco al final
 
@@ -239,7 +293,7 @@ def query_kimi(client, prompt, heavy_mode=False, simple_mode=False, interactive=
         print("\n   Verifica tu cuenta en: https://openrouter.ai")
         sys.exit(1)
 
-def interactive_mode(client):
+def interactive_mode(client, api_key):
     """Modo interactivo - conversación continua"""
     print(f"\n{Colors.OKGREEN}💬 Modo interactivo activado{Colors.ENDC}")
     print(f"{Colors.WARNING}Escribe 'salir', 'exit' o 'quit' para terminar{Colors.ENDC}")
@@ -262,7 +316,7 @@ def interactive_mode(client):
                 heavy = True
                 prompt = prompt[6:].strip()
 
-            query_kimi(client, prompt, heavy_mode=heavy, interactive=True)
+            query_kimi(client, prompt, heavy_mode=heavy, interactive=True, api_key=api_key)
             print()  # Separador entre respuestas
 
         except KeyboardInterrupt:
@@ -336,7 +390,7 @@ def main():
             api_key = load_api_key()
             client = create_client(api_key)
             prompt = ' '.join(sys.argv[2:])
-            query_kimi(client, prompt, heavy_mode=True)
+            query_kimi(client, prompt, heavy_mode=True, api_key=api_key)
             sys.exit(0)
 
         # Simple Mode
@@ -345,7 +399,7 @@ def main():
             api_key = load_api_key()
             client = create_client(api_key)
             prompt = ' '.join(sys.argv[2:])
-            query_kimi(client, prompt, simple_mode=True)
+            query_kimi(client, prompt, simple_mode=True, api_key=api_key)
             sys.exit(0)
 
         # Comando único (cualquier texto)
@@ -353,14 +407,14 @@ def main():
         api_key = load_api_key()
         client = create_client(api_key)
         prompt = ' '.join(sys.argv[1:])
-        query_kimi(client, prompt)
+        query_kimi(client, prompt, api_key=api_key)
         sys.exit(0)
 
     # Modo interactivo (sin argumentos)
     print_banner()
     api_key = load_api_key()
     client = create_client(api_key)
-    interactive_mode(client)
+    interactive_mode(client, api_key)
 
 if __name__ == '__main__':
     main()
