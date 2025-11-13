@@ -88,29 +88,42 @@ def create_client(api_key):
 def get_credits_balance(api_key):
     """Obtiene el balance de créditos de OpenRouter"""
     try:
-        response = requests.get(
+        # Intentar primero el endpoint de créditos (para cuentas prepago)
+        credits_response = requests.get(
+            "https://openrouter.ai/api/v1/credits",
+            headers={"Authorization": f"Bearer {api_key}"},
+            timeout=5
+        )
+
+        if credits_response.status_code == 200:
+            credits_data = credits_response.json()
+            if 'data' in credits_data:
+                total_credits = credits_data['data'].get('total_credits', 0)
+                total_usage = credits_data['data'].get('total_usage', 0)
+                balance = total_credits - total_usage
+
+                return {
+                    'success': True,
+                    'is_prepaid': True,
+                    'total_credits': total_credits,
+                    'usage': total_usage,
+                    'balance': balance
+                }
+
+        # Si falla, intentar el endpoint de auth/key (cuentas con límite)
+        auth_response = requests.get(
             "https://openrouter.ai/api/v1/auth/key",
             headers={"Authorization": f"Bearer {api_key}"},
             timeout=5
         )
 
-        if response.status_code == 200:
-            data = response.json()
-            # OpenRouter devuelve info en data.data
+        if auth_response.status_code == 200:
+            data = auth_response.json()
             if 'data' in data:
                 limit = data['data'].get('limit')
                 usage = data['data'].get('usage', 0)
 
-                # Si no hay límite (cuenta prepago), solo mostramos el uso
-                if limit is None or limit == 0:
-                    return {
-                        'success': True,
-                        'is_prepaid': True,
-                        'usage': usage,
-                        'limit': None,
-                        'remaining': None
-                    }
-                else:
+                if limit is not None and limit > 0:
                     remaining = limit - usage
                     return {
                         'success': True,
@@ -269,19 +282,32 @@ def query_kimi(client, prompt, heavy_mode=False, simple_mode=False, interactive=
 
             # Obtener y mostrar balance de créditos de OpenRouter
             if api_key:
-                balance = get_credits_balance(api_key)
-                if balance['success']:
-                    # Cuenta prepago (sin límite fijo)
-                    if balance.get('is_prepaid'):
-                        usage = balance['usage']
-                        print(f"  {Colors.OKBLUE}💳 Cuenta prepago (créditos disponibles){Colors.ENDC}")
-                        print(f"  {Colors.OKGREEN}   Uso acumulado: ${usage:.2f} USD{Colors.ENDC}")
-                        print(f"  {Colors.WARNING}   💡 Ver saldo en: https://openrouter.ai/credits{Colors.ENDC}")
+                balance_info = get_credits_balance(api_key)
+                if balance_info['success']:
+                    # Cuenta prepago (créditos prepagados)
+                    if balance_info.get('is_prepaid'):
+                        balance = balance_info['balance']
+                        total_credits = balance_info['total_credits']
+                        usage = balance_info['usage']
+
+                        # Color según el balance disponible
+                        if balance > 10:
+                            color = Colors.OKGREEN
+                            status = "✓"
+                        elif balance > 5:
+                            color = Colors.WARNING
+                            status = "⚠"
+                        else:
+                            color = Colors.FAIL
+                            status = "⚠"
+
+                        print(f"  {color}{status} Balance disponible: ${balance:.2f} USD{Colors.ENDC}")
+                        print(f"  {Colors.OKBLUE}   (Total: ${total_credits:.2f} | Gastado: ${usage:.4f}){Colors.ENDC}")
                     # Cuenta con límite fijo
                     else:
-                        remaining = balance['remaining']
-                        limit = balance['limit']
-                        usage = balance['usage']
+                        remaining = balance_info['remaining']
+                        limit = balance_info['limit']
+                        usage = balance_info['usage']
 
                         # Color según el balance disponible
                         if remaining > 10:
@@ -297,7 +323,7 @@ def query_kimi(client, prompt, heavy_mode=False, simple_mode=False, interactive=
                         print(f"  {color}{status} Saldo disponible: ${remaining:.2f} USD{Colors.ENDC}")
                         print(f"  {Colors.OKBLUE}   (Límite: ${limit:.2f} | Usado: ${usage:.2f}){Colors.ENDC}")
                 else:
-                    print(f"  {Colors.WARNING}⚠ No se pudo obtener el saldo: {balance.get('error', 'Error desconocido')}{Colors.ENDC}")
+                    print(f"  {Colors.WARNING}⚠ No se pudo obtener el saldo: {balance_info.get('error', 'Error desconocido')}{Colors.ENDC}")
 
         print()  # Línea en blanco al final
 
