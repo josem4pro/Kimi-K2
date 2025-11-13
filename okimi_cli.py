@@ -199,15 +199,16 @@ def get_tools():
         }
     ]
 
-def query_kimi(client, prompt, heavy_mode=False, simple_mode=False, interactive=False, api_key=None):
+def query_kimi(client, prompt, heavy_mode=False, simple_mode=False, web_mode=False, interactive=False, api_key=None):
     """
     Consulta a Kimi K2 Thinking vía OpenRouter con todas las capacidades activadas
 
     Args:
         client: Cliente de OpenAI configurado
         prompt: Pregunta/prompt para el modelo
-        heavy_mode: Activar Heavy Mode (8 trayectorias paralelas)
+        heavy_mode: Activar Heavy Mode (8 trayectorias paralelas + tools)
         simple_mode: Modo simple sin razonamiento extendido
+        web_mode: Activar herramientas (web, código, memoria) sin heavy mode
         interactive: Modo interactivo (permite conversación continua)
         api_key: API key para consultar balance de créditos
     """
@@ -220,22 +221,25 @@ def query_kimi(client, prompt, heavy_mode=False, simple_mode=False, interactive=
                 "role": "system",
                 "content": "Eres Kimi K2 Thinking, un modelo avanzado de razonamiento profundo. "
                           "Razona paso a paso y sé exhaustivo en tus respuestas. "
-                          "Si necesitas información externa, indícalo claramente en tu respuesta."
+                          "Tienes acceso a herramientas para búsqueda web, ejecución de código y memoria distribuida."
             },
             {"role": "user", "content": prompt}
         ],
         "max_tokens": 16384,  # Respuestas exhaustivas (~12,000 palabras)
         "temperature": 0.3,  # Balance entre precisión y creatividad
-        # Tools deshabilitadas por defecto - sin implementación real aún
-        # Para habilitar: descomentar las siguientes líneas
-        # "tools": get_tools(),
-        # "tool_choice": "auto",
     }
 
-    # Activar Heavy Mode si se solicita
+    # Activar herramientas si se solicita (web_mode o heavy_mode)
+    if web_mode or heavy_mode:
+        config["tools"] = get_tools()
+        config["tool_choice"] = "auto"
+
+    # Activar Heavy Mode si se solicita (8 trayectorias + tools)
     if heavy_mode:
         config["extra_body"] = {"heavy_mode": True}
-        print(f"\n{Colors.WARNING}⚡ Heavy Mode activado: 8 trayectorias paralelas{Colors.ENDC}")
+        print(f"\n{Colors.WARNING}⚡ Heavy Mode activado: 8 trayectorias paralelas + herramientas{Colors.ENDC}")
+    elif web_mode:
+        print(f"\n{Colors.OKCYAN}🌐 Web Mode activado: razonamiento + herramientas{Colors.ENDC}")
 
     if simple_mode:
         config["max_tokens"] = 1000
@@ -245,7 +249,13 @@ def query_kimi(client, prompt, heavy_mode=False, simple_mode=False, interactive=
     print(f"\n{Colors.OKGREEN}✓ Modelo listo: Kimi K2 Thinking (OpenRouter){Colors.ENDC}")
     print(f"{Colors.OKBLUE}📊 Capacidades activas:{Colors.ENDC}")
     print(f"   • Contexto: 256K tokens")
-    print(f"   • Tool-calling: Deshabilitado (respuesta directa)")
+
+    # Indicar si las herramientas están activas
+    if web_mode or heavy_mode:
+        print(f"   • Tool-calling: ✓ Habilitado (web, código, memoria)")
+    else:
+        print(f"   • Tool-calling: ✗ Deshabilitado (respuesta directa)")
+
     print(f"   • Max tokens: {config['max_tokens']}")
     print(f"   • Temperature: {config['temperature']}")
     print(f"   • Provider: OpenRouter")
@@ -343,7 +353,8 @@ def interactive_mode(client, api_key):
     """Modo interactivo - conversación continua"""
     print(f"\n{Colors.OKGREEN}💬 Modo interactivo activado{Colors.ENDC}")
     print(f"{Colors.WARNING}Escribe 'salir', 'exit' o 'quit' para terminar{Colors.ENDC}")
-    print(f"{Colors.WARNING}Escribe 'heavy: tu pregunta' para usar Heavy Mode{Colors.ENDC}\n")
+    print(f"{Colors.WARNING}Escribe 'heavy: tu pregunta' para Heavy Mode{Colors.ENDC}")
+    print(f"{Colors.WARNING}Escribe 'web: tu pregunta' para Web Mode{Colors.ENDC}\n")
 
     while True:
         try:
@@ -356,13 +367,18 @@ def interactive_mode(client, api_key):
                 print(f"\n{Colors.OKCYAN}👋 ¡Hasta pronto!{Colors.ENDC}")
                 break
 
-            # Detectar si se pide Heavy Mode
+            # Detectar modo especial
             heavy = False
+            web = False
+
             if prompt.lower().startswith('heavy:'):
                 heavy = True
                 prompt = prompt[6:].strip()
+            elif prompt.lower().startswith('web:'):
+                web = True
+                prompt = prompt[4:].strip()
 
-            query_kimi(client, prompt, heavy_mode=heavy, interactive=True, api_key=api_key)
+            query_kimi(client, prompt, heavy_mode=heavy, web_mode=web, interactive=True, api_key=api_key)
             print()  # Separador entre respuestas
 
         except KeyboardInterrupt:
@@ -382,21 +398,27 @@ def show_help():
 
 {Colors.OKGREEN}Opciones:{Colors.ENDC}
   -h, --help                     Muestra esta ayuda
-  --heavy "pregunta"             Activa Heavy Mode (8 trayectorias paralelas)
   --simple "pregunta"            Modo simple (respuesta rápida sin razonamiento)
+  --web "pregunta"               Web Mode (razonamiento + herramientas)
+  --heavy "pregunta"             Heavy Mode (8 trayectorias + herramientas)
 
 {Colors.OKGREEN}Ejemplos:{Colors.ENDC}
   okimi "¿Qué es un sistema de memoria distribuida?"
-  okimi --heavy "Diseña una arquitectura de agentes IA multi-nivel"
-  okimi --simple "Explica en pocas palabras qué es K2 Thinking"
+  okimi --simple "Resume en 3 líneas qué es K2 Thinking"
+  okimi --web "Busca info reciente sobre Kimi K2"
+  okimi --heavy "Diseña arquitectura completa multi-agente"
 
 {Colors.OKGREEN}Capacidades activadas:{Colors.ENDC}
   ✓ Contexto: 256K tokens
-  ✓ Tool-calling: búsqueda, código, memoria distribuida
   ✓ Razonamiento extendido: 200-300 pasos
-  ✓ Heavy Mode opcional: 8 trayectorias paralelas
   ✓ Transparencia: cadenas de pensamiento visibles
   ✓ Provider: OpenRouter (acceso a 100+ modelos)
+
+{Colors.OKGREEN}Modos disponibles:{Colors.ENDC}
+  • Simple (--simple): Respuesta rápida sin razonamiento extendido
+  • Normal (default): Razonamiento completo sin herramientas
+  • Web (--web): Razonamiento + herramientas (1 trayectoria)
+  • Heavy (--heavy): Razonamiento + herramientas (8 trayectorias)
 
 {Colors.OKGREEN}Configuración:{Colors.ENDC}
   API Key: ~/.env (OPENROUTER_API_KEY)
@@ -430,15 +452,6 @@ def main():
             show_help()
             sys.exit(0)
 
-        # Heavy Mode
-        if arg == '--heavy' and len(sys.argv) > 2:
-            print_banner()
-            api_key = load_api_key()
-            client = create_client(api_key)
-            prompt = ' '.join(sys.argv[2:])
-            query_kimi(client, prompt, heavy_mode=True, api_key=api_key)
-            sys.exit(0)
-
         # Simple Mode
         if arg == '--simple' and len(sys.argv) > 2:
             print_banner()
@@ -446,6 +459,24 @@ def main():
             client = create_client(api_key)
             prompt = ' '.join(sys.argv[2:])
             query_kimi(client, prompt, simple_mode=True, api_key=api_key)
+            sys.exit(0)
+
+        # Web Mode (herramientas sin heavy)
+        if arg == '--web' and len(sys.argv) > 2:
+            print_banner()
+            api_key = load_api_key()
+            client = create_client(api_key)
+            prompt = ' '.join(sys.argv[2:])
+            query_kimi(client, prompt, web_mode=True, api_key=api_key)
+            sys.exit(0)
+
+        # Heavy Mode (8 trayectorias + herramientas)
+        if arg == '--heavy' and len(sys.argv) > 2:
+            print_banner()
+            api_key = load_api_key()
+            client = create_client(api_key)
+            prompt = ' '.join(sys.argv[2:])
+            query_kimi(client, prompt, heavy_mode=True, api_key=api_key)
             sys.exit(0)
 
         # Comando único (cualquier texto)
