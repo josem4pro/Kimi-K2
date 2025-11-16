@@ -1,0 +1,29 @@
+{
+  "execution_id": "13af4664-0922-4635-a91b-f7642b2357fa",
+  "timestamp": "2025-11-16T13:41:50.991437",
+  "model_id": "kimi_k2_normal",
+  "benchmark_id": "reasoning",
+  "config": {
+    "max_tokens": 4000,
+    "temperature": 0.3,
+    "heavy_mode": false,
+    "seed": null
+  },
+  "input": {
+    "prompt": "A baker has eggs, flour, and sugar. He can make: Cake (needs all 3), Bread (needs flour only), Cookies (needs eggs and sugar). He wants to make exactly 2 different items. What are his options? List all possibilities.",
+    "system_prompt": "You are a helpful AI assistant. Think step by step.",
+    "context_tokens": 76
+  },
+  "output": {
+    "response": "The baker has all three ingredients (eggs, flour, sugar) available. To determine valid options, we check if the combined ingredient requirements for each pair of items are satisfied:\n\n1. **Cake and Bread**: Requires eggs, flour, and sugar (for cake) plus flour (for bread). All three ingredients are available. \u2705\n\n2. **Cake and Cookies**: Requires eggs, flour, and sugar (for cake) plus eggs and sugar (for cookies). All three ingredients are available. \u2705\n\n3. **Bread and Cookies**: Requires flour (for bread) plus eggs and sugar (for cookies). All three ingredients are available. \u2705\n\nAll three possible pairs are feasible. The baker's options are:\n\n- **Cake and Bread**\n- **Cake and Cookies**\n- **Bread and Cookies**",
+    "reasoning": ""
+  },
+  "metrics": {
+    "correctness": true,
+    "time_to_first_token": 2.7111791285002256,
+    "tokens_per_second": 90.51412258980865,
+    "total_time": 27.111791285002255,
+    "output_tokens": 2454
+  },
+  "heavy_mode_data": null
+}

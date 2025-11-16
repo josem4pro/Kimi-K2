@@ -1,0 +1,34 @@
+{
+  "execution_id": "605b7583-96de-480a-80f5-58e727161b87",
+  "timestamp": "2025-11-16T13:44:06.836316",
+  "model_id": "kimi_k2_heavy",
+  "benchmark_id": "reasoning",
+  "config": {
+    "max_tokens": 8000,
+    "temperature": 0.3,
+    "heavy_mode": true,
+    "seed": null
+  },
+  "input": {
+    "prompt": "A baker has eggs, flour, and sugar. He can make: Cake (needs all 3), Bread (needs flour only), Cookies (needs eggs and sugar). He wants to make exactly 2 different items. What are his options? List all possibilities.",
+    "system_prompt": "You are a helpful AI assistant. Think step by step.",
+    "context_tokens": 76
+  },
+  "output": {
+    "response": "The baker has three possible options for making exactly 2 different items:\n\n1. **Cake and Bread**\n2. **Cake and Cookies**\n3. **Bread and Cookies**\n\nAll three pairs are possible since he has all the required ingredient types (eggs, flour, and sugar) and each pair's combined ingredient needs are a subset of what he has available.",
+    "reasoning": ""
+  },
+  "metrics": {
+    "correctness": true,
+    "time_to_first_token": 4.958399813500001,
+    "tokens_per_second": 81.63924153471251,
+    "total_time": 49.583998135,
+    "output_tokens": 4048
+  },
+  "heavy_mode_data": {
+    "trajectories": [],
+    "hybridized_output": "The baker has three possible options for making exactly 2 different items:\n\n1. **Cake and Bread**\n2. **Cake and Cookies**\n3. **Bread and Cookies**\n\nAll three pairs are possible since he has all the required ingredient types (eggs, flour, and sugar) and each pair's combined ingredient needs are a subset of what he has available.",
+    "diversity_score": 0.0,
+    "convergence_pattern": "unknown"
+  }
+}

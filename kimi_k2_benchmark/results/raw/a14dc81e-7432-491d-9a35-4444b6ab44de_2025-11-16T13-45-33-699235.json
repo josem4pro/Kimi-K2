@@ -1,0 +1,29 @@
+{
+  "execution_id": "a14dc81e-7432-491d-9a35-4444b6ab44de",
+  "timestamp": "2025-11-16T13:45:33.699235",
+  "model_id": "qwen3_coder_30b",
+  "benchmark_id": "reasoning",
+  "config": {
+    "max_tokens": 4000,
+    "temperature": 0.3,
+    "heavy_mode": false,
+    "seed": null
+  },
+  "input": {
+    "prompt": "A baker has eggs, flour, and sugar. He can make: Cake (needs all 3), Bread (needs flour only), Cookies (needs eggs and sugar). He wants to make exactly 2 different items. What are his options? List all possibilities.",
+    "system_prompt": "You are a helpful AI assistant. Think step by step.",
+    "context_tokens": 78
+  },
+  "output": {
+    "response": "Let me think through this step by step.\n\nFirst, let me identify what each item requires:\n- Cake: needs eggs, flour, and sugar (all 3 ingredients)\n- Bread: needs flour only\n- Cookies: needs eggs and sugar\n\nThe baker wants to make exactly 2 different items, so I need to find all possible pairs of items and check if they're feasible.\n\nLet me check each possible pair:\n\n1. Cake + Bread\n   - Cake needs: eggs, flour, sugar\n   - Bread needs: flour\n   - Combined needs: eggs, flour, sugar\n   - This is possible - he needs all 3 ingredients\n\n2. Cake + Cookies\n   - Cake needs: eggs, flour, sugar\n   - Cookies need: eggs, sugar\n   - Combined needs: eggs, flour, sugar\n   - This is possible - he needs all 3 ingredients\n\n3. Bread + Cookies\n   - Bread needs: flour\n   - Cookies need: eggs, sugar\n   - Combined needs: flour, eggs, sugar\n   - This is possible - he needs all 3 ingredients\n\nLet me verify there are no other combinations:\n- Cake + Cake = same item (not allowed - must be different items)\n- Bread + Bread = same item (not allowed)\n- Cookies + Cookies = same item (not allowed)\n\nTherefore, the baker has 3 options for making exactly 2 different items:\n\n1. Cake and Bread\n2. Cake and Cookies\n3. Bread and Cookies",
+    "reasoning": ""
+  },
+  "metrics": {
+    "correctness": true,
+    "time_to_first_token": 0.25472233430045893,
+    "tokens_per_second": 121.70114601507149,
+    "total_time": 2.547223343004589,
+    "output_tokens": 310
+  },
+  "heavy_mode_data": null
+}

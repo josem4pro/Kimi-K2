@@ -1,0 +1,29 @@
+{
+  "execution_id": "adf7037d-725b-4787-8c0f-f32a1b44efef",
+  "timestamp": "2025-11-16T13:42:21.985143",
+  "model_id": "kimi_k2_normal",
+  "benchmark_id": "math",
+  "config": {
+    "max_tokens": 4000,
+    "temperature": 0.3,
+    "heavy_mode": false,
+    "seed": null
+  },
+  "input": {
+    "prompt": "What is the sum of all positive divisors of 360? Show your work step by step.",
+    "system_prompt": "You are a helpful AI assistant. Think step by step.",
+    "context_tokens": 43
+  },
+  "output": {
+    "response": "**Step 1: Find the prime factorization of 360**\n\nFirst, we break down 360 into its prime factors:\n- 360 = 36 \u00d7 10\n- 36 = 6 \u00d7 6 = (2 \u00d7 3) \u00d7 (2 \u00d7 3) = 2\u00b2 \u00d7 3\u00b2\n- 10 = 2 \u00d7 5\n\nCombining these: 360 = 2\u00b2 \u00d7 3\u00b2 \u00d7 2 \u00d7 5 = **2\u00b3 \u00d7 3\u00b2 \u00d7 5\u00b9**\n\n**Step 2: Apply the sum of divisors formula**\n\nFor a number n = p\u2081^a\u2081 \u00d7 p\u2082^a\u2082 \u00d7 ... \u00d7 p\u2096^a\u2096, the sum of its positive divisors is:\n\u03c3(n) = (p\u2081^(a\u2081+1) - 1)/(p\u2081 - 1) \u00d7 (p\u2082^(a\u2082+1) - 1)/(p\u2082 - 1) \u00d7 ... \u00d7 (p\u2096^a\u2096+1 - 1)/(p\u2096 - 1)\n\n**Step 3: Calculate each factor's contribution**\n\nFor 2\u00b3: (2^(3+1) - 1)/(2 - 1) = (16 - 1)/1 = **15**\nFor 3\u00b2: (3^(2+1) - 1)/(3 - 1) = (27 - 1)/2 = 26/2 = **13**\nFor 5\u00b9: (5^(1+1) - 1)/(5 - 1) = (25 - 1)/4 = 24/4 = **6**\n\n**Step 4: Multiply the results**\n\nTotal sum = 15 \u00d7 13 \u00d7 6\n- 15 \u00d7 13 = 195\n- 195 \u00d7 6 = **1170**\n\n**Answer: The sum of all positive divisors of 360 is 1170.**",
+    "reasoning": ""
+  },
+  "metrics": {
+    "correctness": true,
+    "time_to_first_token": 1.714500227798999,
+    "tokens_per_second": 84.57275050126107,
+    "total_time": 17.145002277989988,
+    "output_tokens": 1450
+  },
+  "heavy_mode_data": null
+}

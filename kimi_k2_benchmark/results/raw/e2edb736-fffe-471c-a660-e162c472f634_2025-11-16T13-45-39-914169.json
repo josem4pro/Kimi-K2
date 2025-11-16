@@ -1,0 +1,29 @@
+{
+  "execution_id": "e2edb736-fffe-471c-a660-e162c472f634",
+  "timestamp": "2025-11-16T13:45:39.914169",
+  "model_id": "qwen3_coder_30b",
+  "benchmark_id": "coding",
+  "config": {
+    "max_tokens": 4000,
+    "temperature": 0.3,
+    "heavy_mode": false,
+    "seed": null
+  },
+  "input": {
+    "prompt": "Write a Python function find_two_sum(arr, target) that finds two indices i and j where i < j and arr[i] + arr[j] = target. Use O(n) time complexity with a hash map. Return (i, j) tuple or None.",
+    "system_prompt": "You are a helpful AI assistant. Think step by step.",
+    "context_tokens": 79
+  },
+  "output": {
+    "response": "Looking at this problem, I need to find two indices where the sum of their values equals the target, with the constraint that i < j.\n\nLet me think through the approach:\n1. Use a hash map to store values we've seen and their indices\n2. For each element, check if (target - current_value) exists in the hash map\n3. If it does, and the index is less than current index, we found our pair\n4. Add current element to hash map for future lookups\n\nHere's my solution:\n\n```python\ndef find_two_sum(arr, target):\n    \"\"\"\n    Find two indices i and j where i < j and arr[i] + arr[j] = target.\n    \n    Args:\n        arr: List of integers\n        target: Target sum\n    \n    Returns:\n        Tuple (i, j) where i < j and arr[i] + arr[j] = target, or None if not found\n    \"\"\"\n    # Hash map to store value -> index mapping\n    seen = {}\n    \n    for j in range(len(arr)):\n        complement = target - arr[j]\n        \n        # Check if complement exists in our hash map\n        if complement in seen:\n            i = seen[complement]\n            # Ensure i < j (as required by the problem)\n            if i < j:\n                return (i, j)\n        \n        # Add current element to hash map\n        seen[arr[j]] = j\n    \n    return None\n\n# Test cases\nif __name__ == \"__main__\":\n    # Test case 1: Normal case\n    print(find_two_sum([2, 7, 11, 15], 9))  # Expected: (0, 1)\n    \n    # Test case 2: No solution\n    print(find_two_sum([1, 2, 3], 7))  # Expected: None\n    \n    # Test case 3: Same elements\n    print(find_two_sum([3, 2, 4], 6))  # Expected: (1, 2)\n    \n    # Test case 4: Negative numbers\n    print(find_two_sum([-1, 0, 1, 2], 1))  # Expected: (0, 3)\n    \n    # Test case 5: Empty array\n    print(find_two_sum([], 0))  # Expected: None\n    \n    # Test case 6: Two elements that sum to target\n    print(find_two_sum([5, 3], 8))  # Expected: (0, 1)\n```\n\n**How it works:**\n\n1. **Hash Map Approach**: I maintain a hash map `seen` that maps values to their indices\n2. **For each element at index `j`**:\n   - Calculate `complement = target - arr[j]`\n   - Check if `complement` exists in `seen` \n   - If it does and the stored index `i` is less than `j`, return `(i, j)`\n   - Add current element `arr[j]` to `seen` with index `j`\n3. **Time Complexity**: O(n) - single pass through array\n4. **Space Complexity**: O(n) - hash map stores at most n elements\n\n**Key Points:**\n- The constraint `i < j` is handled by checking if the stored index is less than current index\n- We process elements left to right, so we only consider valid pairs where the first index comes before the second\n- The hash map ensures we can find complements in O(1) time\n- Returns `None` if no valid pair is found\n\nThe function correctly handles edge cases like empty arrays, no solutions, and negative numbers.",
+    "reasoning": ""
+  },
+  "metrics": {
+    "correctness": true,
+    "time_to_first_token": 0.6181190132992924,
+    "tokens_per_second": 125.21860407895755,
+    "total_time": 6.181190132992924,
+    "output_tokens": 774
+  },
+  "heavy_mode_data": null
+}

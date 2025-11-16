@@ -1,0 +1,29 @@
+{
+  "execution_id": "f05f3a47-8650-4ffa-9493-60e27a71bf4e",
+  "timestamp": "2025-11-16T13:42:04.793059",
+  "model_id": "kimi_k2_normal",
+  "benchmark_id": "coding",
+  "config": {
+    "max_tokens": 4000,
+    "temperature": 0.3,
+    "heavy_mode": false,
+    "seed": null
+  },
+  "input": {
+    "prompt": "Write a Python function find_two_sum(arr, target) that finds two indices i and j where i < j and arr[i] + arr[j] = target. Use O(n) time complexity with a hash map. Return (i, j) tuple or None.",
+    "system_prompt": "You are a helpful AI assistant. Think step by step.",
+    "context_tokens": 77
+  },
+  "output": {
+    "response": "```python\ndef find_two_sum(arr, target):\n    \"\"\"\n    Finds two indices i and j where i < j and arr[i] + arr[j] = target.\n    \n    Args:\n        arr: List of integers\n        target: Target sum\n        \n    Returns:\n        Tuple of indices (i, j) if found, otherwise None\n    \"\"\"\n    # Create a hash map to store values and their indices\n    seen = {}\n    \n    # Iterate through the array\n    for i, num in enumerate(arr):\n        complement = target - num\n        \n        # Check if complement exists in hash map\n        if complement in seen:\n            # Return the indices (previous index, current index)\n            return (seen[complement], i)\n        \n        # Add current number and its index to hash map\n        seen[num] = i\n    \n    # No solution found\n    return None\n```",
+    "reasoning": ""
+  },
+  "metrics": {
+    "correctness": true,
+    "time_to_first_token": 1.3749207670000034,
+    "tokens_per_second": 94.11451416385486,
+    "total_time": 13.749207670000033,
+    "output_tokens": 1294
+  },
+  "heavy_mode_data": null
+}

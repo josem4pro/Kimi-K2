@@ -1,0 +1,116 @@
+benchmarks:
+  reasoning:
+    multi_hop_puzzles:
+      count: 20
+      difficulty: "progressive"
+      description: "Multi-hop logic puzzles requiring chained deductions"
+
+    recursive_decomposition:
+      count: 15
+      max_depth: 5
+      description: "Problems requiring recursive breakdown into subproblems"
+
+    constraint_satisfaction:
+      count: 15
+      complexity: "increasing"
+      description: "Constraint satisfaction problems with growing complexity"
+
+    causal_reasoning:
+      count: 10
+      chain_length: "variable"
+      description: "Causal reasoning chains - focus on heavy mode advantage"
+
+  coding:
+    optimization_challenge:
+      count: 10
+      includes_find_special_pairs: true
+      description: "Algorithm optimization problems including find_special_pairs"
+
+    legacy_refactor:
+      count: 8
+      code_smells: ["god_class", "long_method", "feature_envy", "data_clump"]
+      description: "Refactoring legacy code with multiple code smells"
+
+    multi_paradigm:
+      count: 6
+      paradigms: ["functional", "oop", "reactive"]
+      description: "Multi-paradigm implementations"
+
+    debug_challenge:
+      count: 10
+      bug_types: ["off_by_one", "race_condition", "memory_leak", "logic_error"]
+      description: "Debug challenges with subtle bugs"
+
+    architecture_design:
+      count: 5
+      requirements:
+        events_per_second: 10000000
+        latency_p99_ms: 100
+        consistency: "exactly_once"
+      description: "Distributed architecture design for 10M events/s"
+
+  math:
+    competition_problems:
+      count: 30
+      sources: ["IMO", "Putnam", "AIME"]
+      years: "2020-2025"
+      description: "Mathematical competition problems"
+
+    proof_generation:
+      count: 15
+      includes_verification: true
+      description: "Formal proof generation and verification"
+
+    applied_modeling:
+      count: 4
+      domains: ["epidemiology", "financial_derivatives", "quantum_mechanics", "climate"]
+      description: "Applied mathematical modeling scenarios"
+
+  creative:
+    style_transfer:
+      count: 5
+      styles: ["Hemingway", "Academic", "DrSeuss", "Legal", "GenZ_Social"]
+      description: "Writing style transfer tasks"
+
+    narrative_coherence:
+      count: 5
+      simultaneous_constraints: 5
+      description: "Narrative coherence with multiple constraints"
+
+  agentic:
+    long_tool_chains:
+      count: 8
+      min_tool_calls: 50
+      description: "Long chains of tool usage (50+ calls)"
+
+    dynamic_replanning:
+      count: 5
+      interruptions: 5
+      description: "Dynamic planning with requirement changes"
+
+    multi_agent_coordination:
+      count: 3
+      roles: ["Researcher", "Developer", "Reviewer"]
+      description: "Multi-agent coordination tasks"
+
+  stress:
+    adversarial_inputs:
+      count: 10
+      types: ["contradictions", "no_solution", "malformed", "prompt_injection"]
+      description: "Adversarial and edge case inputs"
+
+    extreme_context:
+      count: 5
+      max_tokens: 200000
+      description: "Extreme context length tests (~200K tokens)"
+
+    tool_call_stress:
+      count: 3
+      max_calls: 300
+      description: "Stress test with up to 300 tool calls"
+
+    language_domain_transfer:
+      count: 8
+      languages: ["Spanish", "Chinese", "Mixed_Code"]
+      domains: ["math_notation", "legal_jargon", "medical_terms"]
+      description: "Cross-language and domain transfer"

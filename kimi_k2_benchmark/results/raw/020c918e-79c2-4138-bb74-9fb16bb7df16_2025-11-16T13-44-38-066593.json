@@ -1,0 +1,34 @@
+{
+  "execution_id": "020c918e-79c2-4138-bb74-9fb16bb7df16",
+  "timestamp": "2025-11-16T13:44:38.066593",
+  "model_id": "kimi_k2_heavy",
+  "benchmark_id": "math",
+  "config": {
+    "max_tokens": 8000,
+    "temperature": 0.3,
+    "heavy_mode": true,
+    "seed": null
+  },
+  "input": {
+    "prompt": "What is the sum of all positive divisors of 360? Show your work step by step.",
+    "system_prompt": "You are a helpful AI assistant. Think step by step.",
+    "context_tokens": 43
+  },
+  "output": {
+    "response": "**Step\u202f1: Factor 360 into primes**\n\n\\[\n360 = 2^3 \\cdot 3^2 \\cdot 5^1\n\\]\n\n**Step\u202f2: Use the sum\u2011of\u2011divisors function**\n\nFor a number \\(n = p_1^{a_1}p_2^{a_2}\\dots p_k^{a_k}\\), the sum of its positive divisors is\n\n\\[\n\\sigma(n)=\\prod_{i=1}^{k}\\frac{p_i^{a_i+1}-1}{p_i-1}.\n\\]\n\nBecause the factors are coprime, we can also compute \\(\\sigma\\) for each prime power separately and then multiply.\n\n**Step\u202f3: Compute \\(\\sigma\\) for each prime power**\n\n*For \\(2^3\\):*\n\n\\[\n\\sigma(2^3)=1+2+4+8=\\frac{2^{4}-1}{2-1}= \\frac{16-1}{1}=15.\n\\]\n\n*For \\(3^2\\):*\n\n\\[\n\\sigma(3^2)=1+3+9=\\frac{3^{3}-1}{3-1}= \\frac{27-1}{2}=13.\n\\]\n\n*For \\(5^1\\):*\n\n\\[\n\\sigma(5^1)=1+5=\\frac{5^{2}-1}{5-1}= \\frac{25-1}{4}=6.\n\\]\n\n**Step\u202f4: Multiply the results**\n\n\\[\n\\sigma(360)=\\sigma(2^3)\\cdot\\sigma(3^2)\\cdot\\sigma(5^1)=15 \\times 13 \\times 6.\n\\]\n\nFirst multiply \\(15 \\times 13 = 195\\), then \\(195 \\times 6 = 1170\\).\n\n\\[\n\\boxed{1170}\n\\]\n\nSo the sum of all positive divisors of 360 is **1170**.",
+    "reasoning": ""
+  },
+  "metrics": {
+    "correctness": true,
+    "time_to_first_token": 1.9881638664999628,
+    "tokens_per_second": 101.65158084065995,
+    "total_time": 19.881638664999628,
+    "output_tokens": 2021
+  },
+  "heavy_mode_data": {
+    "trajectories": [],
+    "hybridized_output": "**Step\u202f1: Factor 360 into primes**\n\n\\[\n360 = 2^3 \\cdot 3^2 \\cdot 5^1\n\\]\n\n**Step\u202f2: Use the sum\u2011of\u2011divisors function**\n\nFor a number \\(n = p_1^{a_1}p_2^{a_2}\\dots p_k^{a_k}\\), the sum of its positive divisors is\n\n\\[\n\\sigma(n)=\\prod_{i=1}^{k}\\frac{p_i^{a_i+1}-1}{p_i-1}.\n\\]\n\nBecause the factors are coprime, we can also compute \\(\\sigma\\) for each prime power separately and then multiply.\n\n**Step\u202f3: Compute \\(\\sigma\\) for each prime power**\n\n*For \\(2^3\\):*\n\n\\[\n\\sigma(2^3)=1+2+4+8=\\frac{2^{4}-1}{2-1}= \\frac{16-1}{1}=15.\n\\]\n\n*For \\(3^2\\):*\n\n\\[\n\\sigma(3^2)=1+3+9=\\frac{3^{3}-1}{3-1}= \\frac{27-1}{2}=13.\n\\]\n\n*For \\(5^1\\):*\n\n\\[\n\\sigma(5^1)=1+5=\\frac{5^{2}-1}{5-1}= \\frac{25-1}{4}=6.\n\\]\n\n**Step\u202f4: Multiply the results**\n\n\\[\n\\sigma(360)=\\sigma(2^3)\\cdot\\sigma(3^2)\\cdot\\sigma(5^1)=15 \\times 13 \\times 6.\n\\]\n\nFirst multiply \\(15 \\times 13 = 195\\), then \\(195 \\times 6 = 1170\\).\n\n\\[\n\\boxed{1170}\n\\]\n\nSo the sum of all positive divisors of 360 is **1170**.",
+    "diversity_score": 0.0,
+    "convergence_pattern": "unknown"
+  }
+}

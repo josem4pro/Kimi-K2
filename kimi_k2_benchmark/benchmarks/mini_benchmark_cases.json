@@ -1,0 +1,75 @@
+{
+  "reasoning": [
+    {
+      "id": "reasoning.logic.001",
+      "prompt": "If A is taller than B, B is taller than C, and D is shorter than A but taller than C, who is the third tallest? Think step by step.",
+      "expected_answer": "B",
+      "category": "multi_hop",
+      "difficulty": "medium"
+    },
+    {
+      "id": "reasoning.logic.002",
+      "prompt": "In a family, there are 2 parents and 3 children. Each parent shakes hands with each child exactly once. Each child shakes hands with each other child exactly once. How many handshakes occur in total?",
+      "expected_answer": "9",
+      "category": "constraint_satisfaction",
+      "difficulty": "easy"
+    },
+    {
+      "id": "reasoning.causal.001",
+      "prompt": "A traffic light turned red, causing a car to stop. The car stopping made the following car brake suddenly. This sudden braking triggered the third car's collision avoidance system. What was the root cause of the collision avoidance activation?",
+      "expected_answer": "traffic light",
+      "category": "causal_reasoning",
+      "difficulty": "medium"
+    }
+  ],
+  "coding": [
+    {
+      "id": "coding.optimization.001",
+      "prompt": "Write a Python function that finds all pairs (i, j) where i < j and arr[i] + arr[j] equals a target sum. Optimize for O(n) time complexity. Example: arr=[2,7,11,15], target=9 returns [(0,1)]",
+      "expected_answer": "def find_pairs",
+      "category": "optimization",
+      "difficulty": "medium"
+    },
+    {
+      "id": "coding.debug.001",
+      "prompt": "Debug this code:\ndef factorial(n):\n    if n == 0:\n        return 0\n    return n * factorial(n-1)\n\nWhat's wrong and how to fix it?",
+      "expected_answer": "return 1",
+      "category": "debug",
+      "difficulty": "easy"
+    }
+  ],
+  "math": [
+    {
+      "id": "math.competition.001",
+      "prompt": "What is the sum of all positive integers n for which n^2 - 19n + 99 is a perfect square?",
+      "expected_answer": "38",
+      "category": "competition",
+      "difficulty": "hard"
+    },
+    {
+      "id": "math.proof.001",
+      "prompt": "Prove that the sum of the first n odd numbers equals n^2. Show the proof step by step.",
+      "expected_answer": "n^2",
+      "category": "proof",
+      "difficulty": "medium"
+    }
+  ],
+  "creative": [
+    {
+      "id": "creative.style.001",
+      "prompt": "Rewrite 'The algorithm processed the data efficiently' in the style of Dr. Seuss.",
+      "expected_answer": "algorithm",
+      "category": "style_transfer",
+      "difficulty": "medium"
+    }
+  ],
+  "agentic": [
+    {
+      "id": "agentic.planning.001",
+      "prompt": "You need to: 1) Search for weather data, 2) Parse the JSON response, 3) Extract temperature, 4) Convert Celsius to Fahrenheit, 5) Format as HTML. Describe each step and the data flow.",
+      "expected_answer": "temperature",
+      "category": "tool_chain",
+      "difficulty": "medium"
+    }
+  ]
+}

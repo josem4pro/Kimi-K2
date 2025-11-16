@@ -1,0 +1,29 @@
+{
+  "execution_id": "41249ff4-5204-4861-857f-1945ab063b42",
+  "timestamp": "2025-11-16T13:42:54.353107",
+  "model_id": "kimi_k2_normal",
+  "benchmark_id": "creative",
+  "config": {
+    "max_tokens": 4000,
+    "temperature": 0.3,
+    "heavy_mode": false,
+    "seed": null
+  },
+  "input": {
+    "prompt": "Rewrite this sentence in the style of Shakespeare: 'The computer crashed and I lost all my work.'",
+    "system_prompt": "You are a helpful AI assistant. Think step by step.",
+    "context_tokens": 43
+  },
+  "output": {
+    "response": "Alas! My thinking machine hath perished, and all my labors are turned to naught.",
+    "reasoning": ""
+  },
+  "metrics": {
+    "correctness": false,
+    "time_to_first_token": 3.2319616520006096,
+    "tokens_per_second": 65.03790039398659,
+    "total_time": 32.31961652000609,
+    "output_tokens": 2102
+  },
+  "heavy_mode_data": null
+}

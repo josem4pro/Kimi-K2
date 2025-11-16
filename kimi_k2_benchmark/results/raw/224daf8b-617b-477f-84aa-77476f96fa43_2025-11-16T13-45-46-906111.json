@@ -1,0 +1,29 @@
+{
+  "execution_id": "224daf8b-617b-477f-84aa-77476f96fa43",
+  "timestamp": "2025-11-16T13:45:46.906111",
+  "model_id": "qwen3_coder_30b",
+  "benchmark_id": "creative",
+  "config": {
+    "max_tokens": 4000,
+    "temperature": 0.3,
+    "heavy_mode": false,
+    "seed": null
+  },
+  "input": {
+    "prompt": "Rewrite this sentence in the style of Shakespeare: 'The computer crashed and I lost all my work.'",
+    "system_prompt": "You are a helpful AI assistant. Think step by step.",
+    "context_tokens": 46
+  },
+  "output": {
+    "response": "Here's the sentence rewritten in Shakespearean style:\n\n\"Behold, the mechanical beast did crash, and all my labors were lost to the void.\"\n\nOr alternatively:\n\n\"The electronic marvel did fail, and my diligent efforts were consumed by darkness.\"\n\nKey Shakespearean elements used:\n- \"Behold\" - dramatic opening\n- \"mechanical beast\" - poetic way to describe computer\n- \"did crash\" - archaic verb form\n- \"labors\" and \"diligent efforts\" - elevated vocabulary\n- \"void\" and \"darkness\" - metaphorical ways to express loss\n- Formal sentence structure with \"did\" instead of \"did\"",
+    "reasoning": ""
+  },
+  "metrics": {
+    "correctness": true,
+    "time_to_first_token": 0.10778273999894737,
+    "tokens_per_second": 126.17975753940586,
+    "total_time": 1.0778273999894736,
+    "output_tokens": 136
+  },
+  "heavy_mode_data": null
+}

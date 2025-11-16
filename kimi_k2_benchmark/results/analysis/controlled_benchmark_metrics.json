@@ -1,0 +1,59 @@
+{
+  "kimi_k2_normal": {
+    "accuracy": 80.0,
+    "mean_latency": 22.662341416001436,
+    "mean_tokens_per_second": 82.83143763221847,
+    "by_category": {
+      "reasoning": {
+        "accuracy": 100.0
+      },
+      "coding": {
+        "accuracy": 100.0
+      },
+      "math": {
+        "accuracy": 100.0
+      },
+      "creative": {
+        "accuracy": 0.0
+      }
+    }
+  },
+  "kimi_k2_heavy": {
+    "accuracy": 80.0,
+    "mean_latency": 28.218659176598884,
+    "mean_tokens_per_second": 92.18663808273755,
+    "by_category": {
+      "reasoning": {
+        "accuracy": 100.0
+      },
+      "coding": {
+        "accuracy": 100.0
+      },
+      "math": {
+        "accuracy": 100.0
+      },
+      "creative": {
+        "accuracy": 0.0
+      }
+    }
+  },
+  "qwen3_coder_30b": {
+    "accuracy": 80.0,
+    "mean_latency": 6.213491118201636,
+    "mean_tokens_per_second": 117.74675716346569,
+    "by_category": {
+      "reasoning": {
+        "accuracy": 100.0
+      },
+      "coding": {
+        "accuracy": 100.0
+      },
+      "math": {
+        "accuracy": 0.0
+      },
+      "creative": {
+        "accuracy": 100.0
+      }
+    }
+  }
+}

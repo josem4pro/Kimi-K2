@@ -1,0 +1,94 @@
+metrics:
+  correctness:
+    type: "accuracy"
+    description: "Percentage of correct solutions"
+    aggregation: "mean"
+
+  reasoning_depth:
+    type: "numeric"
+    description: "Average length of reasoning chain (steps/tokens)"
+    aggregation: "mean"
+
+  time_to_first_token:
+    type: "latency"
+    unit: "seconds"
+    description: "Time until first token generated"
+    aggregation: "p50"
+
+  tokens_per_second:
+    type: "throughput"
+    unit: "tokens/s"
+    description: "Token generation speed"
+    aggregation: "mean"
+
+  total_time_to_solution:
+    type: "latency"
+    unit: "seconds"
+    description: "Total time from prompt to complete solution"
+    aggregation: "mean"
+
+  code_quality:
+    cyclomatic_complexity:
+      type: "numeric"
+      description: "McCabe cyclomatic complexity"
+      lower_is_better: true
+
+    maintainability_index:
+      type: "numeric"
+      range: [0, 100]
+      description: "Maintainability index (higher is better)"
+
+    test_pass_rate:
+      type: "percentage"
+      description: "Percentage of generated tests that pass"
+
+  heavy_mode_specific:
+    trajectory_diversity:
+      type: "numeric"
+      range: [0, 1]
+      description: "Variance/diversity among 8 trajectories"
+
+    hybridization_quality:
+      type: "numeric"
+      range: [0, 1]
+      description: "Quality of final hybridized output vs best single trajectory"
+
+    convergence_pattern:
+      type: "categorical"
+      values: ["unanimous", "majority", "split", "divergent"]
+      description: "Pattern of agreement among trajectories"
+
+    trajectory_agreement_score:
+      type: "numeric"
+      range: [0, 1]
+      description: "Degree of agreement across trajectories"
+
+  comparative:
+    heavy_mode_advantage:
+      type: "percentage"
+      description: "Performance gain of heavy over normal mode"
+      formula: "(heavy_score - normal_score) / normal_score * 100"
+
+    wins_losses_ties:
+      type: "record"
+      fields: ["wins", "losses", "ties"]
+      description: "Head-to-head record vs comparison model"
+
+    performance_delta:
+      type: "numeric"
+      description: "Absolute performance difference"
+
+  resource_efficiency:
+    cost_per_solution:
+      type: "monetary"
+      unit: "USD"
+      description: "Estimated cost per solution"
+
+    tokens_consumed:
+      type: "numeric"
+      description: "Total tokens used (input + output)"
+
+    memory_usage:
+      type: "numeric"
+      unit: "MB"
+      description: "Peak memory usage during inference"

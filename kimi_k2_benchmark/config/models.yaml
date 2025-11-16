@@ -1,0 +1,34 @@
+models:
+  kimi_k2_normal:
+    provider: "chutes"
+    model: "moonshotai/Kimi-K2-Thinking"
+    api_base: "https://llm.chutes.ai/v1"
+    max_tokens: 4000
+    temperature: 0.3
+    heavy_mode: false
+    description: "Kimi K2 in normal mode via Chutes.ai"
+
+  kimi_k2_heavy:
+    provider: "chutes"
+    model: "moonshotai/Kimi-K2-Thinking"
+    api_base: "https://llm.chutes.ai/v1"
+    max_tokens: 8000
+    temperature: 0.3
+    heavy_mode: true
+    num_trajectories: 8
+    hybridization: true
+    description: "Kimi K2 in heavy mode - 8 parallel trajectories with hybridization"
+
+  qwen3_coder_30b:
+    provider: "ollama"
+    model: "qwen3-coder:30b"
+    api_base: "http://localhost:11434/v1"
+    max_tokens: 4000
+    temperature: 0.3
+    description: "Qwen3 Coder 30B running locally via Ollama"
+
+# Environment variable mapping
+env_keys:
+  chutes: "CHUTES_API_KEY"
+  moonshot: "MOONSHOT_API_KEY"
+  openrouter: "OPENROUTER_API_KEY"
